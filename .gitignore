@@ -1,3 +1,6 @@
 sds_venv/
 .DS_Store
 datasets/
+__pycache__/
+.ipynb_checkpoints/
+*.ipynb
