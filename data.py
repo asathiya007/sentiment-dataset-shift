@@ -1,7 +1,9 @@
 # import modules 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import numpy as np
-import pandas as pd 
+from numpy.core.fromnumeric import mean
+import pandas as pd
+from pandas.core.indexes import multi 
 from texthero import preprocessing, clean
 
 def default_posneg_loader(): 
@@ -101,24 +103,20 @@ def extrapolate_distribution(data):
     data = data.set_index(['dataset', 'sentiment'])
     data = data.sort_index()
 
-    # get multivariate mean and variance for each multi-index pair 
+    # get multivariate mean and covariance for each multi-index pair 
     multi_indices = list(set(data.index))
-    vector_means = [] 
-    vector_variances = []
+    multi_indices.sort()
+    vector_means, vector_covariances = [], []
     for dataset, sentiment in multi_indices: 
         vectors = list(data.loc[(dataset, sentiment), 
             'vectorized_text'])
         vectors = np.array(vectors)
-        vector_means.append(list(np.mean(vectors, axis=0)))
-        vector_variances.append(list(np.var(vectors, axis=0)))
+        mean = np.mean(vectors, axis=0)
+        mean = np.reshape(mean, (mean.shape[0], 1))
+        vector_means.append(mean)
+        vector_covariances.append(np.cov(vectors, rowvar=False))
+    vector_means = np.stack(vector_means, axis=0)
+    vector_covariances = np.stack(vector_covariances, axis=0)
 
-    # consolidate information to mean table and variance table 
-    mean_info = pd.DataFrame(data=vector_means, 
-        index=pd.MultiIndex.from_tuples(multi_indices, 
-        names=['dataset', 'sentiment']))
-    variance_info = pd.DataFrame(data=vector_variances, 
-        index=pd.MultiIndex.from_tuples(multi_indices, 
-        names=['dataset', 'sentiment']))
-        
-    # return mean and variance information
-    return mean_info, variance_info
+    # return mean and covariance information
+    return multi_indices, vector_means, vector_covariances
