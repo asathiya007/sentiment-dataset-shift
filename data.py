@@ -1,71 +1,10 @@
 # import modules 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-import numpy as np
-from numpy.core.fromnumeric import mean
 import pandas as pd
-from pandas.core.indexes import multi 
 from texthero import preprocessing, clean
 
-def default_posneg_loader(): 
-    # load IMDB data 
-    imdb_data = pd.read_csv('./datasets/IMDB/IMDBDataset.csv')
-    imdb_data['dataset'] = 'IMDB'
-    imdb_data['text'] = imdb_data['review']
-    imdb_data = imdb_data[['text', 'sentiment', 'dataset']]
 
-    # load movie reviews data 
-    movie_reviews_data = pd.read_csv('./datasets/MovieReviews/movie_review.csv')
-    movie_reviews_data['sentiment'] = movie_reviews_data['tag']
-    movie_reviews_data['dataset'] = 'Movie Reviews'
-    movie_reviews_data = movie_reviews_data[['text', 'sentiment', 'dataset']]
-
-    # load financial news data 
-    financial_news_data = pd.read_csv('./datasets/FinancialNews/all-data.csv', 
-        encoding="ISO-8859-1", header=None)
-    financial_news_data['text'] = financial_news_data[1]
-    financial_news_data['sentiment'] = financial_news_data[0]
-    financial_news_data['dataset'] = 'Financial News'
-    financial_news_data = financial_news_data[['text', 'sentiment', 'dataset']]
-
-    # concatenate datasets 
-    posneg_data = pd.concat([imdb_data, movie_reviews_data, financial_news_data], 
-        axis=0, ignore_index=True)
-
-    # return loaded datasets 
-    return posneg_data 
-    
-def default_emotions_loader(): 
-    # load emotions dataset 
-    emotions_data = []
-    file = open('./datasets/EmotionsDataset/train.txt')
-    line = file.readline()[:-1]
-    while line: 
-        chunks = line.split(';')
-        emotions_data.append(chunks)
-        line = file.readline()[:-1]
-    emotions_data = pd.DataFrame(emotions_data, columns=['text', 'sentiment'])
-    emotions_data['dataset'] = 'Emotions Dataset'
-
-    # load Twitter dataset 
-    twitter_data = pd.read_csv('./datasets/Twitter/data.csv')
-    twitter_data['text'] = twitter_data['Tweets']
-    twitter_data['sentiment'] = twitter_data['Feeling']
-    twitter_data['dataset'] = 'Twitter'
-    twitter_data = twitter_data[['text', 'sentiment', 'dataset']]
-
-    # load Crowd Flower dataset 
-    crowdflower_data = pd.read_csv('./datasets/CrowdFlower/text_emotion.csv')
-    crowdflower_data['text'] = crowdflower_data['content']
-    crowdflower_data['dataset'] = 'Crowd Flower'
-    crowdflower_data = crowdflower_data[['text', 'sentiment', 'dataset']]
-
-    emotions_data = pd.concat([emotions_data, twitter_data, crowdflower_data], 
-        axis=0, ignore_index=True)
-    
-    # return emotions dataset 
-    return emotions_data
-
-def vectorize_text(data, vector_size=100, epochs=20):
+def _default_vectorize_text(data, vector_size=100, epochs=20):
     # clean text 
     cleaning_pipeline = [
         preprocessing.drop_no_content,
@@ -98,25 +37,68 @@ def vectorize_text(data, vector_size=100, epochs=20):
     # return data with vectorized text
     return data 
 
-def extrapolate_distribution(data): 
-    # create multi-index 
-    data = data.set_index(['dataset', 'sentiment'])
-    data = data.sort_index()
+def default_posneg_loader(): 
+    # load IMDB data 
+    imdb_data = pd.read_csv('./datasets/IMDB/IMDBDataset.csv')
+    imdb_data['dataset'] = 'IMDB'
+    imdb_data['text'] = imdb_data['review']
+    imdb_data = imdb_data[['text', 'sentiment', 'dataset']]
 
-    # get multivariate mean and covariance for each multi-index pair 
-    multi_indices = list(set(data.index))
-    multi_indices.sort()
-    vector_means, vector_covariances = [], []
-    for dataset, sentiment in multi_indices: 
-        vectors = list(data.loc[(dataset, sentiment), 
-            'vectorized_text'])
-        vectors = np.array(vectors)
-        mean = np.mean(vectors, axis=0)
-        mean = np.reshape(mean, (mean.shape[0], 1))
-        vector_means.append(mean)
-        vector_covariances.append(np.cov(vectors, rowvar=False))
-    vector_means = np.stack(vector_means, axis=0)
-    vector_covariances = np.stack(vector_covariances, axis=0)
+    # load movie reviews data 
+    movie_reviews_data = pd.read_csv('./datasets/MovieReviews/movie_review.csv')
+    movie_reviews_data['sentiment'] = movie_reviews_data['tag']
+    movie_reviews_data['dataset'] = 'Movie Reviews'
+    movie_reviews_data = movie_reviews_data[['text', 'sentiment', 'dataset']]
 
-    # return mean and covariance information
-    return multi_indices, vector_means, vector_covariances
+    # load financial news data 
+    financial_news_data = pd.read_csv('./datasets/FinancialNews/all-data.csv', 
+        encoding="ISO-8859-1", header=None)
+    financial_news_data['text'] = financial_news_data[1]
+    financial_news_data['sentiment'] = financial_news_data[0]
+    financial_news_data['dataset'] = 'Financial News'
+    financial_news_data = financial_news_data[['text', 'sentiment', 'dataset']]
+
+    # concatenate datasets 
+    posneg_data = pd.concat([imdb_data, movie_reviews_data, financial_news_data], 
+        axis=0, ignore_index=True)
+
+    # vectorize text 
+    posneg_data = _default_vectorize_text(posneg_data)
+
+    # return loaded datasets 
+    return posneg_data 
+    
+def default_emotions_loader(): 
+    # load emotions dataset 
+    emotions_data = []
+    file = open('./datasets/EmotionsDataset/train.txt')
+    line = file.readline()[:-1]
+    while line: 
+        chunks = line.split(';')
+        emotions_data.append(chunks)
+        line = file.readline()[:-1]
+    emotions_data = pd.DataFrame(emotions_data, columns=['text', 'sentiment'])
+    emotions_data['dataset'] = 'Emotions Dataset'
+
+    # load Twitter dataset 
+    twitter_data = pd.read_csv('./datasets/Twitter/data.csv')
+    twitter_data['text'] = twitter_data['Tweets']
+    twitter_data['sentiment'] = twitter_data['Feeling']
+    twitter_data['dataset'] = 'Twitter'
+    twitter_data = twitter_data[['text', 'sentiment', 'dataset']]
+
+    # load Crowd Flower dataset 
+    crowdflower_data = pd.read_csv('./datasets/CrowdFlower/text_emotion.csv')
+    crowdflower_data['text'] = crowdflower_data['content']
+    crowdflower_data['dataset'] = 'Crowd Flower'
+    crowdflower_data = crowdflower_data[['text', 'sentiment', 'dataset']]
+
+    # concatenate datasets
+    emotions_data = pd.concat([emotions_data, twitter_data, crowdflower_data], 
+        axis=0, ignore_index=True)
+
+    # vectorize text 
+    emotions_data = _default_vectorize_text(emotions_data)
+    
+    # return emotions dataset 
+    return emotions_data

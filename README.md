@@ -4,7 +4,7 @@ Course project for CS 8803 DMM (Data Management and Machine Learning) at Georgia
 # Getting Started 
 Create a Python virtual environment (with Python 3.8) and install the dependencies from the `./requirements.txt` file. 
 
-There are a set of default datasets in the `./datasets.zip` file. If using custom datasets, add them to the `./datasets` directory (produced by unzipping the `./datasets.zip` file) and specify custom data loading functions in the `./data.py` file. The `./data.py` file contains default data loading functions for the default datasets in the `./datasets` directory. 
+There are a set of default datasets in the `./datasets.zip` file. If using custom datasets, add them to the `./datasets` directory (produced by unzipping the `./datasets.zip` file) and specify custom data loading and vectorization functions (if needed) in the `./data.py` file. The `./data.py` file contains default data loading and text vectorizing functions for the default datasets in the `./datasets` directory. 
 
 # Default Datasets
 The default datasets used in this paper are listed below. 
