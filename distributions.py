@@ -1,5 +1,6 @@
 # import modules 
 import numpy as np
+from scipy.linalg import sqrtm
 
 
 def extrapolate_dataset_distribution(data): 
@@ -35,8 +36,7 @@ def extrapolate_sentiment_distribution(data):
     multi_indices.sort()
     vector_means, vector_covariances = [], []
     for dataset, sentiment in multi_indices: 
-        vectors = list(data.loc[(dataset, sentiment), 
-            'vectorized_text'])
+        vectors = list(data.loc[(dataset, sentiment), 'vectorized_text'])
         vectors = np.array(vectors)
         mean = np.mean(vectors, axis=0)
         mean = np.reshape(mean, (mean.shape[0], 1))
@@ -49,13 +49,18 @@ def extrapolate_sentiment_distribution(data):
     return multi_indices, vector_means, vector_covariances
 
 def _compute_bhattacharyya_distance(mean1, mean2, covariance1, covariance2):
+    # generate cholesky factorization to avoid divide by zero errors
+    covariance1 = np.linalg.cholesky(covariance1)
+    covariance2 = np.linalg.cholesky(covariance2)
+
     # compute first term of Bhattacharyya distance 
     covariance = (covariance1 + covariance2) / 2
     det_covariance = np.linalg.det(covariance)
     det_covariance1 = np.linalg.det(covariance1)
     det_covariance2 = np.linalg.det(covariance2)
+    det_covariances = np.sqrt(det_covariance1 * det_covariance2)
     bhattacharyya_distance_term1 = 1 / 2 * np.log(det_covariance 
-        / np.sqrt(det_covariance1 * det_covariance2))
+        / det_covariances)
 
     # compute second term of Bhattacharyya distance 
     mean_diff = mean2 - mean1
@@ -74,17 +79,13 @@ def _compute_bhattacharyya_distance(mean1, mean2, covariance1, covariance2):
     # return Bhattacharyya distance 
     return bhattacharyya_distance
 
-def compute_adjusted_bhattacharyya_distances(indices, means, covariances, 
-    adjustment_factor=1):
+def compute_bhattacharyya_distances(indices, means, covariances):
     # compute bhattacharyya distances for each pair of datasets 
     bhattacharyya_distances = np.zeros((len(indices), len(indices)))
     for i in range(len(indices)):
         for j in range(len(indices)):
-            mean1, mean2 = means[i], means[j]
-            covariance1 = covariances[i] * adjustment_factor
-            covariance2 = covariances[j] * adjustment_factor
             bhattacharyya_distances[i, j] = _compute_bhattacharyya_distance(
-                mean1, mean2, covariance1, covariance2)
+                means[i], means[j], covariances[i], covariances[j])
     
     # return computed Bhattacharyya distances 
     return bhattacharyya_distances
