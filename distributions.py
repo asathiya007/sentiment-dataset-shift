@@ -58,7 +58,7 @@ def _compute_bhattacharyya_distance(mean1, mean2, covariance1, covariance2):
         / np.sqrt(det_covariance1 * det_covariance2))
 
     # compute second term of Bhattacharyya distance 
-    mean_diff = mean1 - mean2
+    mean_diff = mean2 - mean1
     bhattacharyya_distance_term2 = 1 / 8 * np.matmul(
         np.matmul(
             np.transpose(mean_diff), 
