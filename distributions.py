@@ -1,6 +1,5 @@
 # import modules 
 import numpy as np
-from scipy.linalg import sqrtm
 
 
 def extrapolate_dataset_distribution(data): 
