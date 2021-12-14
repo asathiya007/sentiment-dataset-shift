@@ -67,6 +67,33 @@ def default_posneg_loader():
 
     # return loaded datasets 
     return posneg_data 
+
+def loadEmotionsDataset():
+    emotions_data = []
+    file = open('./datasets/EmotionsDataset/train.txt')
+    line = file.readline()[:-1]
+    while line: 
+        chunks = line.split(';')
+        emotions_data.append(chunks)
+        line = file.readline()[:-1]
+    emotions_data = pd.DataFrame(emotions_data, columns=['text', 'sentiment'])
+    emotions_data['dataset'] = 'Emotions Dataset'
+    return _default_vectorize_text(emotions_data)
+
+def loadTwitterDataset():
+    twitter_data = pd.read_csv('./datasets/Twitter/data.csv')
+    twitter_data['text'] = twitter_data['Tweets']
+    twitter_data['sentiment'] = twitter_data['Feeling']
+    twitter_data['dataset'] = 'Twitter'
+    twitter_data = twitter_data[['text', 'sentiment', 'dataset']]
+    return _default_vectorize_text(twitter_data)
+
+def loadCrowdFlowerDataset():
+    crowdflower_data = pd.read_csv('./datasets/CrowdFlower/text_emotion.csv')
+    crowdflower_data['text'] = crowdflower_data['content']
+    crowdflower_data['dataset'] = 'Crowd Flower'
+    crowdflower_data = crowdflower_data[['text', 'sentiment', 'dataset']]
+    return _default_vectorize_text(crowdflower_data)
     
 def default_emotions_loader(): 
     # load emotions dataset 
