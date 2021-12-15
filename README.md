@@ -8,6 +8,8 @@ There are a set of default datasets in the `./datasets.zip` file. If using custo
 
 To run the sentiment dataset shift pipeline, open the `sentiment_dataset_shift.py` file and specify the arguments (loading function, CSV filename to save dataset-level shift, and CSV filename to save sentiment-level shift) for any custom datasets, in the same manner as the default arguments already specified in the file. Make sure to import loading function(s) from the `./data.py` file. Then, execute the pipeline with the command `python3 sentiment_dataset_shift.py`. The results will be saved to CSV files with the specified filenames. 
 
+To create visualizations (PNG images) of the saved CSV files, open the `sds_visualizations.py` file and specify the CSV filenames for any custom datasets, in the same manner as the default CSV filenames already specified in the file. Then, execute the pipeline with the command `python3 sds_visualizations.py`. The results will be saved as PNG files with the same filenames as the corresponding CSV files, but with the extension `.png` instead of `.csv`. 
+
 # Default Datasets
 The default datasets used in this paper are listed below. 
 
