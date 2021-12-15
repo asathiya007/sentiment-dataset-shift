@@ -1,5 +1,5 @@
 # sentiment-dataset-shift
-Course project for CS 8803 DMM (Data Management and Machine Learning) at Georgia Tech  (Fall 2021). Quantifies the dataset shift of sentiment classification datasets.
+Course project for CS 8803 DMM (Data Management and Machine Learning) at Georgia Tech  (Fall 2021). This system, Sentiment Dataset Shift, is a pipeline that quantifies the dataset shift of sentiment classification datasets.
 
 # How to Run Locally
 Create a Python virtual environment (with Python 3.8) using `pip` as described here: `https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/` and install the dependencies from the `./requirements.txt` file with the command `pip install -r ./requirements.txt`. 
