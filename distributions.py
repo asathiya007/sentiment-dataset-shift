@@ -71,7 +71,7 @@ def _compute_bhattacharyya_distance(mean1, mean2, covariance1, covariance2):
         mean_diff 
     )
 
-    # computer Bhattacharyya distance from terms 
+    # compute Bhattacharyya distance from terms 
     bhattacharyya_distance = (bhattacharyya_distance_term1 
         + bhattacharyya_distance_term2)
     

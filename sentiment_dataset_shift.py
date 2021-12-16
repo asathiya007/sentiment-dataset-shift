@@ -144,8 +144,9 @@ if __name__=='__main__':
         # get arguments 
         args = arguments_list[i]
 
-        #run dataset shift pipeline
-        print(f'Run {i + 1} of sentiment dataset shift pipeline')
+
+        # run dataset shift pipeline
+        print(f'Run {i + 1} of Sentiment Dataset Shift pipeline')
         sentiment_dataset_shift(args[0], args[1], args[2])
 
         #run alike dataset shift pipeline
